@@ -1,6 +1,16 @@
 # Digit Recognizer
 
-Digit recognizer written in Scala/Akka HTTP using Knn algorithm.
+Digit recognizer written in Scala/Akka HTTP using Knn algorithm. 
+
+The purpose of the project is to test the scalability and the framework being used to implement the service. Knn 
+algorithm is used because it's simple and inefficient. Here's how it works. The system receives an input from the 
+user which is a set of 1024 bytes of binary data (i.e. 101010101). The system has a preset of reference digits. For 
+each digit, the service figures the distance between input and the reference. Once all distances are calculated, they 
+are sorted in assending order. Only the first K entries are taken and counted. The digit whose count is the biggest 
+is the recognized digit. 
+
+This algorithm can be implemented in many ways. To be really fast, one can implement it with lots of parallelism. But
+then such a system will need to survive and be able to continue to be responsive when there's whole lot of load on it.
 
 ## How to run
 ```sh
