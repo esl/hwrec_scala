@@ -7,7 +7,7 @@ Digit recognizer written in Scala/Akka HTTP using Knn algorithm.
 sbt -J-Xmx2g run
 ```
 
-## How to check if it runs correct
+## How to check if it runs correctly
 Open a browser to [http://localhost:4000/index.html](http://localhost:4000/index.html). You should see the screen with
 a white drawing area on the left and the recognition area on the right. Click `New` button at the top left. Try drawing
 digit 0 (zero) as perfectly as possible and as filling up the entire drawing space as possible. You should see the
