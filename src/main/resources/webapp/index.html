@@ -1,0 +1,313 @@
+<!doctype html>
+<html>
+<head>
+<title>Handwriting Recognizer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0" />
+<script src="lib/jquery/jquery-1.8.2.min.js"></script>
+<style type="text/css">
+body {
+    margin:0px;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    font-family:Arial;
+    /* prevent text selection on ui */
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    /* prevent scrolling in windows phone */
+    -ms-touch-action: none;
+    /* prevent selection highlight */
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+        
+.header, .footer{
+    position: absolute;
+    background-color: #222;
+    text-align: center;
+}
+.header {
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    height: 32px;
+    padding:6px;
+}
+.footer {
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    height: 42px;
+    padding:2px;    
+}
+.title {
+    width: auto;
+    line-height: 32px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #eee;
+    text-shadow: 0px -1px #000;
+    padding:0 60px;
+}
+.navbtn {
+    cursor: pointer;
+    float:left;
+    padding: 6px 10px;
+    font-weight: bold;
+    line-height: 18px;
+    font-size: 14px;
+    color: #eee;
+    text-shadow: 0px -1px #000;
+    border: solid 1px #111;
+    border-radius: 4px;
+    background-color: #404040;
+    box-shadow: 0 0 1px 1px #555,inset 0 1px 0 0 #666;     
+}
+.navbtn-hover, .navbtn:active {
+    color: #222;
+    text-shadow: 0px 1px #aaa;
+    background-color: #aaa;
+    box-shadow: 0 0 1px 1px #444,inset 0 1px 0 0 #ccc;   
+}
+
+#content{
+    position: absolute;
+    top: 44px;
+    /*
+    left: 0px;
+    right: 0px;
+    bottom: 0px;*/
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background-color:#ddd;
+    display:table;
+}
+
+#drawing-content {
+
+		/*float:left;*/
+		
+		width:50%;
+		height:100%;
+    overflow:hidden;
+    background-color:#ddd;
+    display:table-cell;
+    vertical-align: middle;
+}
+
+#recognized-content {
+		/*float:left;*/
+		width:50%;
+		height:100%;
+		vertical-align:middle;
+    background-color:#white;
+    display:table-cell;
+    vertical-align: middle;
+}
+
+#recognized-text {
+/*
+	width: 100%;
+	height: 100%; */
+  font-size: 60vh;
+  text-align:center;
+}
+
+#canvas{
+    cursor:crosshair ;
+    background-color:#fff;
+}
+</style>
+<script type="text/javascript">
+	
+var ctx, color = "#000";	
+
+$(document).ready(function () {
+	
+	// setup a new canvas for drawing wait for device init
+    setTimeout(function(){
+	   newCanvas();
+    }, 500);
+		
+	// link the new button with newCanvas() function
+	$("#new").click(function() {
+		newCanvas();
+	});
+});
+
+// recognition timeout
+var recognitionTimeout = null;
+
+function setRecognitionTimeout() {
+	clearRecognitionTimeout();
+	setTimeout(function() {
+		recognizeInputData();
+	}, 1500);
+}
+
+function clearRecognitionTimeout() {
+	if (recognitionTimeout != null) {
+		clearTimeout(recognitionTimeout);
+		recognitionTimeout = null;
+	}
+}
+
+function recognizeInputData() {
+	// get the byte array from the canvas
+	var byteArray = convertCanvasToByteArray();
+	//console.log(JSON.stringify(byteArray));
+	
+	// send the request to 
+	$.ajax({
+			type:'POST',
+			url:"/api/letters", 
+			data:JSON.stringify(byteArray), 
+			success: function(data) {
+				$("#recognized-text").text(data.letter);
+			},
+			contentType:"application/json",
+			dataType:"json"
+	});
+}
+
+function convertCanvasToByteArray() {
+	// create a small canvas first
+	var originalCanvas = $("#canvas")[0];
+	var smallCanvas = $("<canvas width='32px' height='32px'></canvas>")[0];
+	var smallCanvasCtx = smallCanvas.getContext("2d");
+	smallCanvasCtx.drawImage(originalCanvas, 0, 0, 32, 32);
+   $("#small-image").html(smallCanvas);
+	
+	// now convert the the data to byte array
+	var canvasData = smallCanvasCtx.getImageData(0, 0, 32, 32).data;
+	var byteData = [ ];
+	var threshold = 127;
+	for (var i = 0; i < canvasData.length; i += 4) {
+		var lum = canvasData[i+3] == 0 ? 0 : 1;
+		byteData.push(lum);
+	}
+	return byteData;
+}
+
+// function to setup a new canvas for drawing
+function newCanvas(){
+	clearRecognitionTimeout();
+	
+	// calculate canvas size to be multiplication of 32 on both size
+	var canvasWidth = Math.floor(($("#drawing-content").width() / 32)) * 32;
+	var canvasHeight = Math.floor(($("#drawing-content").height() / 32)) * 32;
+   canvasWidth = Math.min(canvasHeight, canvasWidth);
+   canvasHeight = Math.min(canvasHeight, canvasWidth);
+	console.log("cavasWidth: " + canvasWidth + " - windowWidth: " + $("#drawing-content").width());
+	console.log("cavasHeight: " + canvasHeight + " - windowHeight: " + $("#drawing-content").height());
+	
+	//define and resize canvas
+  //  $("#content").height($(window).height()-90);
+    var canvas = '<canvas id="canvas" width="'+canvasWidth+'" height="'+canvasHeight+'"></canvas>';
+	$("#drawing-content").html(canvas);
+    
+    // setup canvas
+	ctx=document.getElementById("canvas").getContext("2d");
+	ctx.strokeStyle = color;
+	ctx.lineWidth = 55;	
+	
+	// setup to trigger drawing on mouse or touch
+	$("#canvas").drawTouch();
+    $("#canvas").drawPointer();
+	$("#canvas").drawMouse();
+}
+
+// prototype to	start drawing on touch using canvas moveTo and lineTo
+$.fn.drawTouch = function() {
+	var start = function(e) {
+		clearRecognitionTimeout();
+    e = e.originalEvent;
+		ctx.beginPath();
+		x = e.changedTouches[0].pageX;
+		y = e.changedTouches[0].pageY-44;
+		ctx.moveTo(x,y);
+	};
+	var move = function(e) {
+		e.preventDefault();
+        e = e.originalEvent;
+		x = e.changedTouches[0].pageX;
+		y = e.changedTouches[0].pageY-44;
+		ctx.lineTo(x,y);
+		ctx.stroke();
+	};
+	$(this).on("touchstart", start);
+	$(this).on("touchmove", move);	
+	$(this).on("touchend", setRecognitionTimeout);
+}; 
+    
+// prototype to	start drawing on pointer(microsoft ie) using canvas moveTo and lineTo
+$.fn.drawPointer = function() {
+	var start = function(e) {
+        e = e.originalEvent;
+		ctx.beginPath();
+		x = e.pageX;
+		y = e.pageY-44;
+		ctx.moveTo(x,y);
+	};
+	var move = function(e) {
+		e.preventDefault();
+        e = e.originalEvent;
+		x = e.pageX;
+		y = e.pageY-44;
+		ctx.lineTo(x,y);
+		ctx.stroke();
+    };
+	$(this).on("MSPointerDown", start);
+	$(this).on("MSPointerMove", move);
+};        
+
+// prototype to	start drawing on mouse using canvas moveTo and lineTo
+$.fn.drawMouse = function() {
+	var clicked = 0;
+	var start = function(e) {
+		clearRecognitionTimeout();
+		clicked = 1;
+		ctx.beginPath();
+		x = e.pageX;
+		y = e.pageY-44;
+		ctx.moveTo(x,y);
+	};
+	var move = function(e) {
+		if(clicked){
+			x = e.pageX;
+			y = e.pageY-44;
+			ctx.lineTo(x,y);
+			ctx.stroke();
+		}
+	};
+	var stop = function(e) {
+		clicked = 0;
+		setRecognitionTimeout();
+	};
+	$(this).on("mousedown", start);
+	$(this).on("mousemove", move);
+	$(this).on("mouseup", stop);
+};
+
+	</script>
+</head>
+<body>
+   <div id="page">
+      <div class="header">
+         <a id="new" class="navbtn">New</a>
+         <div class="title">Digit Recognizer</div>
+      </div>
+      <div id="content">
+         <div id="drawing-content" style="vertical-align: top"></div>
+         <div id="recognized-content">
+            <div id="small-image"></div>
+            <div id="recognized-text">_</div>
+         </div>
+      </div>
+   </div> 
+</body>
+</html>
+
+
