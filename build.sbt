@@ -2,10 +2,11 @@ lazy val akkaHttpVersion = "10.1.9"
 lazy val akkaVersion    = "2.5.25"
 
 lazy val root = (project in file(".")).
+enablePlugins(JavaAppPackaging).
   settings(
     inThisBuild(List(
       organization    := "com.hwrec",
-      scalaVersion    := "2.12.8"
+      scalaVersion    := "2.12.1"
     )),
     name := "hwrec",
     libraryDependencies ++= Seq(
@@ -22,4 +23,3 @@ lazy val root = (project in file(".")).
   )
 
 //cancelable in Global := true
-
