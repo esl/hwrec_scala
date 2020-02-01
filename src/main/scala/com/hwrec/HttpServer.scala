@@ -23,7 +23,8 @@ object HttpServer extends App with Routes with Recognizer with Differentiator wi
 
   val userRegistryActor: ActorRef = system.actorOf(UserRegistryActor.props, "userRegistryActor")
 
-  val interface = "localhost" // InetAddress.getLocalHost.getHostAddress
+  // val interface = "localhost" // InetAddress.getLocalHost.getHostAddress
+  val interface = InetAddress.getLocalHost.getHostAddress
   val serverBinding: Future[Http.ServerBinding] = Http().bindAndHandle(routes, interface, 4000)
   log.info("Routes: {}", routes)
 
