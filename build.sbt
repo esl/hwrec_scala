@@ -14,6 +14,7 @@ enablePlugins(JavaAppPackaging).
       "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpVersion,
       "com.typesafe.akka" %% "akka-http-xml"        % akkaHttpVersion,
       "com.typesafe.akka" %% "akka-stream"          % akkaVersion,
+      "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
 
       "com.typesafe.akka" %% "akka-http-testkit"    % akkaHttpVersion % Test,
       "com.typesafe.akka" %% "akka-testkit"         % akkaVersion     % Test,

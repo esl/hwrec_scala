@@ -11,7 +11,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{ Await, ExecutionContext, Future }
 import scala.util.{ Failure, Success }
 
-object HttpServer extends App with Routes with Recognizer with Differentiator with Data {
+object HttpServer extends App with Routes with Recognizer with Differentiator with Data with DB {
 
   val k: Int = 15
 

@@ -9,7 +9,6 @@ import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.directives.MethodDirectives.post
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
 import spray.json.{ DefaultJsonProtocol, JsArray, JsNumber, JsValue, RootJsonFormat }
-
 import scala.concurrent.{ Await, ExecutionContext, ExecutionContextExecutor, Future }
 
 trait Routes {
@@ -23,6 +22,8 @@ trait Routes {
   val k: Int
   def recognize(inputData: Seq[Byte], k: Int): Future[String]
   def differentiate(id: String, inputData: Seq[Byte]): Future[Double]
+  def write_me(inputData: Seq[Byte])
+  def return_last(x: Integer): List[String]
 
   import scala.concurrent.duration._
   lazy val routes: Route =
@@ -30,23 +31,33 @@ trait Routes {
       pathPrefix("api") {
         concat(
           path("letters") {
-            post {
-              entity(as[JsValue]) { json =>
-                val inputJson = json.asInstanceOf[JsArray]
-                val inputData = inputJson.elements.map(_.asInstanceOf[JsNumber].value.byteValue())
-                val resultFuture = recognize(inputData, k)
-                onSuccess(resultFuture) { digit =>
-                  log.info("Recognized: {}", digit)
-                  val response = HwrecResponse(true, digit)
-                  complete((StatusCodes.OK, response))
-                }
+            concat(
+              post {
+                entity(as[JsValue]) { json =>
+                  val inputJson = json.asInstanceOf[JsArray]
+                  val inputData = inputJson.elements.map(_.asInstanceOf[JsNumber].value.byteValue())
+                  write_me(inputData)
+                  complete((StatusCodes.OK, HwrecResponse(true, "1")))
+                  //                  val resultFuture = recognize(inputData, k)
+                  //                  onSuccess(resultFuture) { digit =>
+                  //                    log.info("Recognized: {}", digit)
+                  //                    val response = HwrecResponse(true, digit)
+                  //                    complete((StatusCodes.OK, response))
+                  //                  }
 
-                //                val digit = Await.result(resultFuture, 10 seconds)
-                //                log.info("Recognized: {}", digit)
-                //                val response = HwrecResponse(true, digit)
-                //                complete((StatusCodes.OK, response))
-              }
-            }
+                  //                val digit = Await.result(resultFuture, 10 seconds)
+                  //                log.info("Recognized: {}", digit)
+                  //                val response = HwrecResponse(true, digit)
+                  //                complete((StatusCodes.OK, response))
+                }
+              },
+              get {
+                val results = return_last(10).toList
+                val itemNames = results.map(_.name)
+                  //                  .map { x => "\"" + x + "\"" }
+                  .mkString("")
+                complete(s"$itemNames")
+              })
           },
           path("diff" / Segment) { id =>
             post {
