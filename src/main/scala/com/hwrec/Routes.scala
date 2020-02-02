@@ -36,6 +36,7 @@ trait Routes {
                 entity(as[JsValue]) { json =>
                   val inputJson = json.asInstanceOf[JsArray]
                   val inputData = inputJson.elements.map(_.asInstanceOf[JsNumber].value.byteValue())
+                  //                  println(inputData)
                   write_me(inputData)
                   complete((StatusCodes.OK, HwrecResponse(true, "1")))
                   //                  val resultFuture = recognize(inputData, k)
@@ -52,7 +53,7 @@ trait Routes {
                 }
               },
               get {
-                val results = return_last(10).toList
+                val results = return_last(10)
                 val itemNames = results.map(_.name)
                   //                  .map { x => "\"" + x + "\"" }
                   .mkString("")
