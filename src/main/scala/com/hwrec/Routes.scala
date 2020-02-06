@@ -33,7 +33,7 @@ trait Routes {
             post {
               entity(as[JsValue]) { json =>
                 val inputJson = json.asInstanceOf[JsArray]
-                val inputData = inputJson.elements.map(_.asInstanceOf[JsNumber].value.byteValue())
+                val inputData = inputJson.elements.map(_.asInstanceOf[JsNumber].value.byteValue)
                 val resultFuture = recognize(inputData, k)
                 onSuccess(resultFuture) { digit =>
                   log.info("Recognized: {}", digit)
@@ -52,7 +52,7 @@ trait Routes {
             post {
               entity(as[JsValue]) { json =>
                 val inputJson = json.asInstanceOf[JsArray]
-                val inputData = inputJson.elements.map(_.asInstanceOf[JsNumber].value.byteValue())
+                val inputData = inputJson.elements.map(_.asInstanceOf[JsNumber].value.byteValue)
                 val resultFuture = differentiate(id, inputData)
                 onSuccess(resultFuture) { distance =>
                   log.info("Differentiated: {}, {}", id, distance)

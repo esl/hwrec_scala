@@ -6,7 +6,7 @@ enablePlugins(JavaAppPackaging).
   settings(
     inThisBuild(List(
       organization    := "com.hwrec",
-      scalaVersion    := "2.12.1"
+      scalaVersion    := "2.13.1"
     )),
     name := "hwrec",
     libraryDependencies ++= Seq(
@@ -18,7 +18,7 @@ enablePlugins(JavaAppPackaging).
       "com.typesafe.akka" %% "akka-http-testkit"    % akkaHttpVersion % Test,
       "com.typesafe.akka" %% "akka-testkit"         % akkaVersion     % Test,
       "com.typesafe.akka" %% "akka-stream-testkit"  % akkaVersion     % Test,
-      "org.scalatest"     %% "scalatest"            % "3.0.5"         % Test
+      "org.scalatest"     %% "scalatest"            % "3.2.0-M2"         % Test
     )
   )
 
