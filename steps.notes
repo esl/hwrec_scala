@@ -5,4 +5,6 @@ $ javac -cp $CP -h . JavaNativeCalculator.java
 [create .cpp file and]
 $ source compile.sh
 [move .dylib file to src/main/resources]
+sbt -J-Xmx2g run
+
 ... ?
