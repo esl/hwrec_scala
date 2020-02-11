@@ -57,8 +57,18 @@ trait RecognizedWithFutures extends KnnTrait {
   import scala.concurrent.ExecutionContext.Implicits.global
 
   def doRecognize(refDigits: Seq[DataEntry], inputData: Seq[Byte], k: Int): Future[String] = {
+    val calc = new JavaNativeCalculator
+    System.loadLibrary("JavaNativeCalculator")
+
     Future.sequence(refDigits
-      .map { case DataEntry(_, digit, _, data) => Future((digit, distance(data, inputData))) })
+      .map {
+        case DataEntry(_, digit, _, data) =>
+          val result = calc.distance(data, inputData)
+
+          Future((
+            digit,
+            distance(data, inputData)))
+      })
       .map(makeSelections(_, k))
     //    import scala.concurrent.duration._
     //    val distances = refDigits

@@ -1,0 +1,8 @@
+
+[convert scala file to .java file with javap command]
+[then in src]
+$ javac -cp $CP -h . JavaNativeCalculator.java
+[create .cpp file and]
+$ source compile.sh
+[move .dylib file to src/main/resources]
+... ?
