@@ -62,9 +62,8 @@ trait RecognizedWithFutures extends KnnTrait {
     Future.sequence(refDigits
       .map {
         case DataEntry(_, digit, _, data) =>
-          Future((
-            digit,
-            calc.distance(data, inputData)))
+          val res = calc.distance(data.toArray, inputData.toArray)
+          Future((digit, res))
       })
       .map(makeSelections(_, k))
     //    import scala.concurrent.duration._
