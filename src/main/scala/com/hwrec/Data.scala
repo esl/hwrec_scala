@@ -10,17 +10,23 @@ import scala.collection.JavaConverters._
 trait Data {
   import Data._
 
-  val referenceData: Seq[DataEntry] = load_data("references")
-  val referenceDataMap: Map[String, DataEntry] = referenceData.map { case d @ DataEntry(id, _, _, _) => id -> d }.toMap
-  lazy val testData: Seq[DataEntry] = load_data("tests")
+  val referenceData: Array[Array[Byte]] = load_data("references")
+  //  val referenceDataMap: Map[String, DataEntry] = referenceData.map { case d @ DataEntry(id, _, _, _) => id -> d }.toMap
+  lazy val testData: Array[Array[Byte]] = load_data("tests")
 }
 
 object Data {
-  case class DataEntry(id: String, digit: String, file: Path, data: Seq[Byte])
+  //  case class DataEntry(id: String, digit: String, file: Path, data: Seq[Byte])
 
-  def load_data(path: String): Seq[DataEntry] = {
+  def load_data(path: String): Array[Array[Byte]] = {
     list_files(path)
-      .map { case (id, digit, file) => DataEntry(id, digit, file, load_file(file)) }
+      .map {
+        case (id, digit, file) =>
+
+          Array[Byte](digit.toByte) ++ load_file(file)
+        //        DataEntry(id, digit, file, load_file(file))
+
+      }.toArray
   }
 
   def list_files(path: String): Seq[(String, String, Path)] = {
@@ -48,12 +54,12 @@ object Data {
     }.toList
   }
 
-  def load_file(file: Path): Seq[Byte] = {
+  def load_file(file: Path): Array[Byte] = {
     val src = Files.readAllBytes(file)
     src
       .filter { c => c != '\n' && c != '\r' }
       .map { c => (c.toInt - 48).toByte }
-      .toSeq
+      .toArray
   }
 }
 

@@ -17,17 +17,30 @@ extern "C" {
      if(x < 0) return -x;
      return x;
  }
+// [[6, 0,1,1,0,1,0], [9,0,0,1,1,0]]
+JNIEXPORT jobjectArray JNICALL Java_com_hwrec_JavaNativeCalculator_distance
+  (JNIEnv * env, jobject ob, jobjectArray data, jbyteArray input){
 
-JNIEXPORT jdouble JNICALL Java_com_hwrec_JavaNativeCalculator_distance
-  (JNIEnv * env, jobject ob, jbyteArray data, jbyteArray input){
-  jdouble res;
-  jbyte * data_arr = env->GetByteArrayElements(input, 0);
+//  jbyte * data_arr = env->GetByteArrayElements(input, 0);
   jbyte * input_arr = env->GetByteArrayElements(data, 0);
+
+
   jsize data_len = env->GetArrayLength(data);
   jsize input_len = env->GetArrayLength(input);
 
-  for(int i = 0;i< data_len;i++){
-  res += abs(data_arr[i] - input_arr[i]);
+  jobjectArray result_array = env -> NewObjectArray()
+  for(int i = 0;i < data_len;i++){
+  jdouble res = 0;
+  jobjectArray tuple_result;
+  jbyteArray fetched_arr = env->GetObjectArrayElement(data, i);
+  jsize fetched_len = env->GetArrayLength(fetched_arr);
+  jbyte first = fetched_arr[0]
+  for (int j = 1;j< fetched_len;j++){
+    res += abs(fetched_arr[j] - input_arr[j-1]);
+  }
+  env->SetObjectArrayElement(tuple_result, 0, first)
+  env->SetObjectArrayElement(tuple_result, 1, res)
+  env->SetObjectArrayElement(result_array, i, tuple_result)
   }
 
   return res;

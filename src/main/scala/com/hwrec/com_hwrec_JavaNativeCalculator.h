@@ -10,10 +10,10 @@ extern "C" {
 /*
  * Class:     com_hwrec_JavaNativeCalculator
  * Method:    distance
- * Signature: ([B[B)D
+ * Signature: ([[B[B)[[B
  */
-JNIEXPORT jdouble JNICALL Java_com_hwrec_JavaNativeCalculator_distance
-  (JNIEnv *, jobject, jbyteArray, jbyteArray);
+JNIEXPORT jobjectArray JNICALL Java_com_hwrec_JavaNativeCalculator_distance
+  (JNIEnv *, jobject, jobjectArray, jbyteArray);
 
 #ifdef __cplusplus
 }

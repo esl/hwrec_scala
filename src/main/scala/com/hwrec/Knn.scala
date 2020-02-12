@@ -7,7 +7,7 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.Uri.Path
 import akka.http.scaladsl.model.{ HttpMethod, HttpMethods, HttpRequest, Uri }
-import com.hwrec.Data.DataEntry
+//import com.hwrec.Data.DataEntry
 import com.typesafe.config.{ Config, ConfigFactory }
 
 import scala.concurrent.{ Await, ExecutionContext, Future }
@@ -38,14 +38,14 @@ trait Knn extends RecognizedWithFutures {
       .head._1
   }
 
-  def recognize(refDigits: Seq[DataEntry], inputData: Seq[Byte], k: Int): Future[String] = {
+  def recognize(refDigits: Array[Array[Byte]], inputData: Seq[Byte], k: Int): Future[String] = {
     doRecognize(refDigits, inputData, k)
   }
 
-  def differentiate(refData: Seq[Byte], inputData: Seq[Byte]): Future[Double] = {
-    import scala.concurrent.ExecutionContext.Implicits.global
-    Future(distance(refData, inputData))
-  }
+  //  def differentiate(refData: Seq[Byte], inputData: Seq[Byte]): Future[Double] = {
+  //    import scala.concurrent.ExecutionContext.Implicits.global
+  //    Future(distance(refData, inputData))
+  //  }
 }
 
 trait KnnTrait {
@@ -57,15 +57,17 @@ trait KnnTrait {
 trait RecognizedWithFutures extends KnnTrait {
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  def doRecognize(refDigits: Seq[DataEntry], inputData: Seq[Byte], k: Int): Future[String] = {
+  def doRecognize(refDigits: Array[Array[Byte]], inputData: Seq[Byte], k: Int): Future[String] = {
 
-    Future.sequence(refDigits
-      .map {
-        case DataEntry(_, digit, _, data) =>
-          val res = calc.distance(data.toArray, inputData.toArray)
-          Future((digit, res))
-      })
-      .map(makeSelections(_, k))
+    //    Future.sequence(refDigits
+    //      .map {
+    //        case DataEntry(_, digit, _, data) =>
+    val res = calc.distance(refDigits, inputData.toArray)
+
+    Future("9")
+    //          Future((digit, res))
+    //      })
+    //      .map(makeSelections(_, k))
     //    import scala.concurrent.duration._
     //    val distances = refDigits
     //      .map { case DataEntry(_, digit, _, data) => Future((digit, distance(data, inputData))) }
@@ -74,43 +76,46 @@ trait RecognizedWithFutures extends KnnTrait {
   }
 }
 
-trait RecognizedWithThreadPool extends KnnTrait {
-  import scala.concurrent.ExecutionContext.Implicits.global
-  //  private val threads = Executors.newCachedThreadPool()
-  private val threads = Executors.newFixedThreadPool(Runtime.getRuntime.availableProcessors())
-  //  private val threads = Executors.newFixedThreadPool(30)
+//trait RecognizedWithThreadPool extends KnnTrait {
+//
+//  import scala.concurrent.ExecutionContext.Implicits.global
+//
+//  //  private val threads = Executors.newCachedThreadPool()
+//  private val threads = Executors.newFixedThreadPool(Runtime.getRuntime.availableProcessors())
+//  //  private val threads = Executors.newFixedThreadPool(30)
+//
+//  def doRecognize(refDigits: Seq[DataEntry], inputData: Seq[Byte], k: Int): Future[String] = {
+//    withFuture(refDigits, inputData, k)
+//  }
+//}
 
-  def doRecognize(refDigits: Seq[DataEntry], inputData: Seq[Byte], k: Int): Future[String] = {
-    withFuture(refDigits, inputData, k)
-  }
+//  private def withoutFuture(refDigits: Seq[DataEntry], inputData: Seq[Byte], k: Int): Future[String] = {
+//    try {
+//      val distances = refDigits
+//        .map {
+//          case DataEntry(_, digit, _, data) =>
+//            threads.submit({ () => (digit, distance(data, inputData)) }: Callable[(String, Double)])
+//        }
+//        .map(_.get())
+//      val result = makeSelections(distances, k)
+//      Future.successful(result)
+//    } catch {
+//      case throwable: Throwable => Future.failed(throwable)
+//    }
+//  }
 
-  private def withoutFuture(refDigits: Seq[DataEntry], inputData: Seq[Byte], k: Int): Future[String] = {
-    try {
-      val distances = refDigits
-        .map {
-          case DataEntry(_, digit, _, data) =>
-            threads.submit({ () => (digit, distance(data, inputData)) }: Callable[(String, Double)])
-        }
-        .map(_.get())
-      val result = makeSelections(distances, k)
-      Future.successful(result)
-    } catch {
-      case throwable: Throwable => Future.failed(throwable)
-    }
-  }
-
-  private def withFuture(refDigits: Seq[DataEntry], inputData: Seq[Byte], k: Int): Future[String] = {
-    Future {
-      val distances = refDigits
-        .map {
-          case DataEntry(_, digit, _, data) =>
-            threads.submit({ () => (digit, distance(data, inputData)) }: Callable[(String, Double)])
-        }
-        .map(_.get())
-      makeSelections(distances, k)
-    }
-  }
-}
+//  private def withFuture(refDigits: Seq[DataEntry], inputData: Seq[Byte], k: Int): Future[String] = {
+//    Future {
+//      val distances = refDigits
+//        .map {
+//          case DataEntry(_, digit, _, data) =>
+//            threads.submit({ () => (digit, distance(data, inputData)) }: Callable[(String, Double)])
+//        }
+//        .map(_.get())
+//      makeSelections(distances, k)
+//    }
+//  }
+//}
 
 //trait RecognizedWithService extends KnnTrait {
 //  import scala.concurrent.ExecutionContext.Implicits.global

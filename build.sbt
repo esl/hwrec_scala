@@ -14,6 +14,7 @@ enablePlugins(JavaAppPackaging).
       "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpVersion,
       "com.typesafe.akka" %% "akka-http-xml"        % akkaHttpVersion,
       "com.typesafe.akka" %% "akka-stream"          % akkaVersion,
+//      "net.java.dev.jna" % "jna-platform" % "4.1.0",
 
       "com.typesafe.akka" %% "akka-http-testkit"    % akkaHttpVersion % Test,
       "com.typesafe.akka" %% "akka-testkit"         % akkaVersion     % Test,
@@ -21,5 +22,7 @@ enablePlugins(JavaAppPackaging).
       "org.scalatest"     %% "scalatest"            % "3.0.5"         % Test
     )
   )
-
+//unmanagedResourceDirectories in Compile += baseDirectory.value / "lib_extra"
+//includeFilter in (Compile, unmanagedResourceDirectories):= ".dll,.so"
+//unmanagedClasspath in (Compile, runMain) += baseDirectory.value / "."
 //cancelable in Global := true
