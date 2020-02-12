@@ -22,7 +22,7 @@ trait Routes {
 
   val k: Int
   def recognize(inputData: Seq[Byte], k: Int): Future[String]
-  def differentiate(id: String, inputData: Seq[Byte]): Future[Double]
+  //  def differentiate(id: String, inputData: Seq[Byte]): Future[Double]
 
   import scala.concurrent.duration._
   lazy val routes: Route =
@@ -47,21 +47,24 @@ trait Routes {
                 //                complete((StatusCodes.OK, response))
               }
             }
-          },
-          path("diff" / Segment) { id =>
-            post {
-              entity(as[JsValue]) { json =>
-                val inputJson = json.asInstanceOf[JsArray]
-                val inputData = inputJson.elements.map(_.asInstanceOf[JsNumber].value.byteValue)
-                val resultFuture = differentiate(id, inputData)
-                onSuccess(resultFuture) { distance =>
-                  log.info("Differentiated: {}, {}", id, distance)
-                  val response = DiffResponse(true, distance)
-                  complete((StatusCodes.OK, response))
-                }
-              }
-            }
-          })
+          }
+        //          ,
+        //          path("diff" / Segment) { id =>
+        //            post {
+        //              entity(as[JsValue]) { json =>
+        //                val inputJson = json.asInstanceOf[JsArray]
+        //                val inputData = inputJson.elements.map(_.asInstanceOf[JsNumber].value.byteValue())
+        //                val resultFuture = differentiate(id, inputData)
+        //                onSuccess(resultFuture) { distance =>
+        //                  log.info("Differentiated: {}, {}", id, distance)
+        //                  val response = DiffResponse(true, distance)
+        //                  complete((StatusCodes.OK, response))
+        //                }
+        //              }
+        //            }
+        //          }
+
+        )
       },
       getFromResourceDirectory("webapp"))
 }

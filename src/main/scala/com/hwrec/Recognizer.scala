@@ -1,12 +1,12 @@
 package com.hwrec
 
 import akka.actor.ActorSystem
-import com.hwrec.Data.DataEntry
+//import com.hwrec.Data.DataEntry
 
 import scala.concurrent.{ ExecutionContext, Future }
 
 trait Recognizer extends Knn {
-  val referenceData: Seq[DataEntry]
+  val referenceData: Array[Array[Byte]]
   implicit val system: ActorSystem
 
   def recognize(inputData: Seq[Byte], k: Int): Future[String] = {
