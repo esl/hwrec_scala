@@ -10,7 +10,7 @@ extern "C" {
 /*
  * Class:     com_hwrec_JavaNativeCalculator
  * Method:    distance
- * Signature: (Lscala/collection/immutable/Seq;Lscala/collection/immutable/Seq;)D
+ * Signature: (Lscala/collection/Seq;Lscala/collection/Seq;)D
  */
 JNIEXPORT jdouble JNICALL Java_com_hwrec_JavaNativeCalculator_distance
   (JNIEnv *, jobject, jobject, jobject);

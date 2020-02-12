@@ -68,7 +68,9 @@ trait Routes {
 
 object Routes extends SprayJsonSupport {
   // import the default encoders for primitive types (Int, String, Lists etc)
+
   import DefaultJsonProtocol._
+  System.loadLibrary("JavaNativeCalculator")
   case class HwrecResponse(ok: Boolean, letter: String)
   case class DiffResponse(ok: Boolean, distance: Double)
   implicit val hwrecResponseJsonFormat: RootJsonFormat[HwrecResponse] = jsonFormat2(HwrecResponse)
