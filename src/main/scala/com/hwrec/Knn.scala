@@ -64,17 +64,6 @@ trait RecognizedWithFutures extends KnnTrait {
     //        case DataEntry(_, digit, _, data) =>
     // wypisz to
 
-    println("printing digits")
-    for (el <- refDigits) {
-      print(el(0) + ", ")
-    }
-
-    val res = calc.distance(refDigits, inputData.toArray)
-    println("printing return digits")
-    for (el <- res) {
-      print(el(0) + ", ")
-    }
-
     Future.sequence(
       res
         .toSeq
