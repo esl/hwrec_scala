@@ -40,8 +40,6 @@ JNIEXPORT jobjectArray JNICALL Java_com_hwrec_JavaNativeCalculator_distance
   for (int j = 1;j< fetched_len;j++){
     res += abs(fetched_arr2[j] - input_arr[j-1]);
   }
-  env->ReleaseByteArrayElements(input, data_arr, 0);
-  env->ReleaseByteArrayElements(data, input_arr, 0);
 
     jbyteArray res_byte = env->NewByteArray(2);
     jbyte mybytes[2];
