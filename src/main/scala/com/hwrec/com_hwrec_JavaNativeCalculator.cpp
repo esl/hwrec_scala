@@ -29,6 +29,8 @@ JNIEXPORT jdouble JNICALL Java_com_hwrec_JavaNativeCalculator_distance
   for(int i = 0;i< data_len;i++){
   res += abs(data_arr[i] - input_arr[i]);
   }
+  env->ReleaseByteArrayElements(input, data_arr, 0);
+  env->ReleaseByteArrayElements(data, input_arr, 0);
 
   return res;
 }
