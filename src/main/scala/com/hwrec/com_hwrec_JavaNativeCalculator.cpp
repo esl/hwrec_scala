@@ -21,29 +21,44 @@ extern "C" {
 JNIEXPORT jobjectArray JNICALL Java_com_hwrec_JavaNativeCalculator_distance
   (JNIEnv * env, jobject ob, jobjectArray data, jbyteArray input){
 
-//  jbyte * data_arr = env->GetByteArrayElements(input, 0);
-  jbyte * input_arr = env->GetByteArrayElements(data, 0);
+    jbyte * input_arr = env->GetByteArrayElements(input, 0);
+    jsize data_len = env->GetArrayLength(data);
+    jsize input_len = env->GetArrayLength(input);
 
+    jclass elementClass = env->FindClass( "[B" );
+    jobjectArray result_array = env -> NewObjectArray(data_len, elementClass, NULL);
 
-  jsize data_len = env->GetArrayLength(data);
-  jsize input_len = env->GetArrayLength(input);
-
-  jobjectArray result_array = env -> NewObjectArray()
   for(int i = 0;i < data_len;i++){
-  jdouble res = 0;
-  jobjectArray tuple_result;
-  jbyteArray fetched_arr = env->GetObjectArrayElement(data, i);
-  jsize fetched_len = env->GetArrayLength(fetched_arr);
-  jbyte first = fetched_arr[0]
+    jint res = 0;
+    jclass classByte= (env)->FindClass("java/lang/Byte");
+    jbyteArray tuple_result = env->NewByteArray(3);
+    jbyteArray fetched_arr = (jbyteArray) env->GetObjectArrayElement(data, i);
+    jbyte * fetched_arr2 = env->GetByteArrayElements(fetched_arr, 0);
+    jsize fetched_len = env-> GetArrayLength(fetched_arr);
+    jbyte digit = fetched_arr2[0];
+
   for (int j = 1;j< fetched_len;j++){
-    res += abs(fetched_arr[j] - input_arr[j-1]);
-  }
-  env->SetObjectArrayElement(tuple_result, 0, first)
-  env->SetObjectArrayElement(tuple_result, 1, res)
-  env->SetObjectArrayElement(result_array, i, tuple_result)
+    res += abs(fetched_arr2[j] - input_arr[j-1]);
   }
 
-  return res;
+    jbyteArray res_byte = env->NewByteArray(2);
+    jbyte mybytes[2];
+    mybytes[0] = (res >> 8) & 0xFF;
+    mybytes[1] = res & 0xFF;
+
+    env->SetByteArrayRegion(tuple_result, 0, 1, &digit);
+    env->SetByteArrayRegion(tuple_result, 1, 2, mybytes);
+    env->SetObjectArrayElement(result_array, i, tuple_result);
+
+//    env -> DeleteLocalRef(fetched_arr);
+    env->ReleaseByteArrayElements(fetched_arr, fetched_arr2, 0);
+//    env -> DeleteLocalRef(tuple_result);
+  }
+
+  env->ReleaseByteArrayElements(input, input_arr, 0);
+//  env -> DeleteLocalRef(result_array);
+
+  return result_array;
 }
 
 #ifdef __cplusplus

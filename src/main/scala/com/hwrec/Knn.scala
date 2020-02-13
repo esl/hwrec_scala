@@ -2,7 +2,7 @@ package com.hwrec
 
 import java.net.URI
 import java.util.concurrent.{ Callable, Executors }
-
+import java.nio.ByteBuffer
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.Uri.Path
@@ -22,11 +22,11 @@ trait Knn extends RecognizedWithFutures {
       .sum
   }
 
-  def makeSelections(distances: Seq[(String, Double)], k: Int): String = {
+  def makeSelections(distances: Seq[(String, Int)], k: Int): String = {
     distances
       .sortBy { case (_, distance) => distance }
       .take(k)
-      .foldLeft(Map[String, Double]()) {
+      .foldLeft(Map[String, Int]()) {
         case (map, (digit, _)) =>
           map
             .get(digit)
@@ -51,7 +51,7 @@ trait Knn extends RecognizedWithFutures {
 trait KnnTrait {
   val calc = new JavaNativeCalculator
   def distance(refData: Seq[Byte], inputData: Seq[Byte]): Double
-  def makeSelections(distances: Seq[(String, Double)], k: Int): String
+  def makeSelections(distances: Seq[(String, Int)], k: Int): String
 }
 
 trait RecognizedWithFutures extends KnnTrait {
@@ -62,17 +62,24 @@ trait RecognizedWithFutures extends KnnTrait {
     //    Future.sequence(refDigits
     //      .map {
     //        case DataEntry(_, digit, _, data) =>
-    val res = calc.distance(refDigits, inputData.toArray)
+    // wypisz to
 
-    Future("9")
-    //          Future((digit, res))
-    //      })
-    //      .map(makeSelections(_, k))
-    //    import scala.concurrent.duration._
-    //    val distances = refDigits
-    //      .map { case DataEntry(_, digit, _, data) => Future((digit, distance(data, inputData))) }
-    //      .map(Await.result(_, 10 seconds))
-    //    Future.successful(makeSelections(distances, k))
+    println("printing digits")
+    for (el <- refDigits) {
+      print(el(0) + ", ")
+    }
+
+    val res = calc.distance(refDigits, inputData.toArray)
+    println("printing return digits")
+    for (el <- res) {
+      print(el(0) + ", ")
+    }
+
+    Future.sequence(
+      res
+        .toSeq
+        .map { arr => Future((arr(0).toString, ByteBuffer.wrap((Array(0, 0, arr(1), arr(2)))).getInt)) })
+      .map(makeSelections(_, k))
   }
 }
 
