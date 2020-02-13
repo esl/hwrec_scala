@@ -63,9 +63,9 @@ trait RecognizedWithFutures extends KnnTrait {
     //      .map {
     //        case DataEntry(_, digit, _, data) =>
     // wypisz to
-
+    
     Future.sequence(
-      res
+      calc.distance(refDigits, inputData.toArray)
         .toSeq
         .map { arr => Future((arr(0).toString, ByteBuffer.wrap((Array(0, 0, arr(1), arr(2)))).getInt)) })
       .map(makeSelections(_, k))
