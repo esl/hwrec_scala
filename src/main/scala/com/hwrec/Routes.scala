@@ -37,6 +37,7 @@ trait Routes {
                 val resultFuture = recognize(inputData, k)
                 onSuccess(resultFuture) { digit =>
                   log.info("Recognized: {}", digit)
+                  println(inputJson)
                   val response = HwrecResponse(true, digit)
                   complete((StatusCodes.OK, response))
                 }
